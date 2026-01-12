@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Category{
+  id Int @id @default(autoincrement())
+  category String
+  movies_categories MoviesCategories[]
+}
+
+model Movie {
+  id Int @id @default(autoincrement())
+  title String
+  lenguage String
+  description String
+  duration Int
+  published_date String
+  distributor String
+  director String
+  posterUrl String
+  trailerUrl String
+  movies_categories MoviesCategories[]
+  screenings Screening[]
+}
+
+model MoviesCategories{
+  id Int @id @default(autoincrement())
+  categoryId Int 
+  category Category @relation(fields: [categoryId], references: [id])
+  movieId Int
+  movie Movie @relation(fields: [movieId], references: [id])
+}
+
+model Cinema{
+  id Int @id @default(autoincrement())
+  name String
+  address String
+  movie_theaters MovieTheater[]
+}
+
+model MovieTheaterType{
+  id Int @id @default(autoincrement())
+  name String
+  number_of_seats Int
+  price Int
+  movie_theaters MovieTheater[]
+}
+
+model MovieTheater{
+  id Int @id @default(autoincrement())
+  cinema Cinema @relation(fields: [cinemaId], references: [id])
+  cinemaId Int
+  movie_theater_type MovieTheaterType @relation(fields: [movie_theater_typeId], references: [id])
+  movie_theater_typeId Int
+  screenings Screening[]
+}
+
+model Screening{
+  id Int @id @default(autoincrement())
+  movie Movie @relation(fields: [movieId], references: [id])
+  movieId Int
+  movie_theater MovieTheater @relation(fields: [movie_theaterId], references: [id])
+  movie_theaterId Int
+  hour DateTime
+  tickets Ticket[]
+}
+
+model Ticket{
+  id Int @id @default(autoincrement())
+  screeningId Int 
+  screening Screening @relation(fields: [screeningId], references: [id])
+  buyers_name String
+  base_price Int
+  movie_discount Int
+  parcial_price Int
+  final_price Int
+}
+
+model Promotions {
+  id Int @id @default(autoincrement())
+  discount Int
+  discount_days DiscountDays[]
+}
+
+model DiscountDays {
+  id Int @id @default(autoincrement())
+  promotionId Int
+  promotion Promotions @relation(fields: [promotionId], references: [id])
+  dayId Int
+  day Days @relation(fields: [dayId], references: [id]) 
+}
+
+model Days {
+  id Int @id @default(autoincrement())
+  name String
+  discount_days DiscountDays[]
+}
